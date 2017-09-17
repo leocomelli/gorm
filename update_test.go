@@ -93,8 +93,8 @@ func TestUpdateWithNoStdPrimaryKeyAndDefaultValues(t *testing.T) {
 		t.Error("RowsAffected should be correct when do batch update")
 	}
 
-	animal = Animal{From: "somewhere"}              // No name fields, should be filled with the default value (galeone)
-	DB.Save(&animal).Update("From", "a nice place") // The name field shoul be untouched
+	animal = Animal{Counter: 100, Fromx: "somewhere"} // No name fields, should be filled with the default value (galeone)
+	DB.Save(&animal).Update("From", "a nice place")   // The name field shoul be untouched
 	DB.First(&animal, animal.Counter)
 	if animal.Name != "galeone" {
 		t.Errorf("Name fields shouldn't be changed if untouched, but got %v", animal.Name)
@@ -210,7 +210,7 @@ func TestSelectWithUpdate(t *testing.T) {
 	reloadUser.Age = 50
 	reloadUser.BillingAddress = Address{Address1: "New Billing Address"}
 	reloadUser.ShippingAddress = Address{Address1: "New ShippingAddress Address"}
-	reloadUser.CreditCard = CreditCard{Number: "987654321"}
+	reloadUser.CreditCard = CreditCard{CardNumber: "987654321"}
 	reloadUser.Emails = []Email{
 		{Email: "new_user_1@example1.com"}, {Email: "new_user_2@example2.com"}, {Email: "new_user_3@example2.com"},
 	}
@@ -243,7 +243,7 @@ func TestSelectWithUpdateWithMap(t *testing.T) {
 		"Age":             50,
 		"BillingAddress":  Address{Address1: "New Billing Address"},
 		"ShippingAddress": Address{Address1: "New ShippingAddress Address"},
-		"CreditCard":      CreditCard{Number: "987654321"},
+		"CreditCard":      CreditCard{CardNumber: "987654321"},
 		"Emails": []Email{
 			{Email: "new_user_1@example1.com"}, {Email: "new_user_2@example2.com"}, {Email: "new_user_3@example2.com"},
 		},
@@ -280,7 +280,7 @@ func TestOmitWithUpdate(t *testing.T) {
 	reloadUser.Age = 50
 	reloadUser.BillingAddress = Address{Address1: "New Billing Address"}
 	reloadUser.ShippingAddress = Address{Address1: "New ShippingAddress Address"}
-	reloadUser.CreditCard = CreditCard{Number: "987654321"}
+	reloadUser.CreditCard = CreditCard{CardNumber: "987654321"}
 	reloadUser.Emails = []Email{
 		{Email: "new_user_1@example1.com"}, {Email: "new_user_2@example2.com"}, {Email: "new_user_3@example2.com"},
 	}
@@ -313,7 +313,7 @@ func TestOmitWithUpdateWithMap(t *testing.T) {
 		"Age":             50,
 		"BillingAddress":  Address{Address1: "New Billing Address"},
 		"ShippingAddress": Address{Address1: "New ShippingAddress Address"},
-		"CreditCard":      CreditCard{Number: "987654321"},
+		"CreditCard":      CreditCard{CardNumber: "987654321"},
 		"Emails": []Email{
 			{Email: "new_user_1@example1.com"}, {Email: "new_user_2@example2.com"}, {Email: "new_user_3@example2.com"},
 		},
@@ -430,7 +430,7 @@ func (e ElementWithIgnoredField) TableName() string {
 }
 
 func TestUpdatesTableWithIgnoredValues(t *testing.T) {
-	elem := ElementWithIgnoredField{Value: "foo", IgnoredField: 10}
+	elem := ElementWithIgnoredField{Id: 1, Value: "foo", IgnoredField: 10}
 	DB.Save(&elem)
 
 	DB.Table(elem.TableName()).

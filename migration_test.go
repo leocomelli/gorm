@@ -3,9 +3,7 @@ package gorm_test
 import (
 	"database/sql"
 	"database/sql/driver"
-	"errors"
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
@@ -13,9 +11,9 @@ import (
 )
 
 type User struct {
-	Id                int64
+	Id                int64 `gorm:"AUTO_INCREMENT"`
 	Age               int64
-	UserNum           Num
+	UserNum           int64
 	Name              string `sql:"size:255"`
 	Email             string
 	Birthday          *time.Time    // Time
@@ -31,8 +29,7 @@ type User struct {
 	Languages         []Language `gorm:"many2many:user_languages;"`
 	CompanyID         *int
 	Company           Company
-	Role              Role
-	PasswordHash      []byte
+	//PasswordHash      []byte
 	IgnoreMe          int64                 `sql:"-"`
 	IgnoreStringSlice []string              `sql:"-"`
 	Ignored           struct{ Name string } `sql:"-"`
@@ -40,36 +37,36 @@ type User struct {
 }
 
 type NotSoLongTableName struct {
-	Id                int64
+	Id                int64 `gorm:"AUTO_INCREMENT"`
 	ReallyLongThingID int64
 	ReallyLongThing   ReallyLongTableNameToTestMySQLNameLengthLimit
 }
 
 type ReallyLongTableNameToTestMySQLNameLengthLimit struct {
-	Id int64
+	Id int64 `gorm:"AUTO_INCREMENT"`
 }
 
 type ReallyLongThingThatReferencesShort struct {
-	Id      int64
+	Id      int64 `gorm:"AUTO_INCREMENT"`
 	ShortID int64
 	Short   Short
 }
 
 type Short struct {
-	Id int64
+	Id int64 `gorm:"AUTO_INCREMENT"`
 }
 
 type CreditCard struct {
-	ID        int8
-	Number    string
-	UserId    sql.NullInt64
-	CreatedAt time.Time `sql:"not null"`
-	UpdatedAt time.Time
-	DeletedAt *time.Time `sql:"column:deleted_time"`
+	ID         int64 `gorm:"AUTO_INCREMENT"`
+	CardNumber string
+	UserId     sql.NullInt64
+	CreatedAt  time.Time `sql:"not null"`
+	UpdatedAt  time.Time
+	DeletedAt  *time.Time `sql:"column:deleted_time"`
 }
 
 type Email struct {
-	Id        int16
+	Id        int64 `gorm:"AUTO_INCREMENT"`
 	UserId    int
 	Email     string `sql:"type:varchar(100);"`
 	CreatedAt time.Time
@@ -77,7 +74,7 @@ type Email struct {
 }
 
 type Address struct {
-	ID        int
+	ID        int `gorm:"AUTO_INCREMENT"`
 	Address1  string
 	Address2  string
 	Post      string
@@ -87,13 +84,14 @@ type Address struct {
 }
 
 type Language struct {
-	gorm.Model
+	//gorm.Model
+	Id    int64 `gorm:"AUTO_INCREMENT"`
 	Name  string
 	Users []User `gorm:"many2many:user_languages;"`
 }
 
 type Product struct {
-	Id                    int64
+	Id                    int64 `gorm:"AUTO_INCREMENT"`
 	Code                  string
 	Price                 int64
 	CreatedAt             time.Time
@@ -110,7 +108,7 @@ type Product struct {
 }
 
 type Company struct {
-	Id    int64
+	Id    int64 `gorm:"AUTO_INCREMENT"`
 	Name  string
 	Owner *User `sql:"-"`
 }
@@ -136,7 +134,7 @@ func (role Role) IsAdmin() bool {
 	return role.Name == "admin"
 }
 
-type Num int64
+/*type Num int64
 
 func (i *Num) Scan(src interface{}) error {
 	switch s := src.(type) {
@@ -147,12 +145,12 @@ func (i *Num) Scan(src interface{}) error {
 		return errors.New("Cannot scan NamedInt from " + reflect.ValueOf(src).String())
 	}
 	return nil
-}
+}*/
 
 type Animal struct {
 	Counter    uint64    `gorm:"primary_key:yes"`
 	Name       string    `sql:"DEFAULT:'galeone'"`
-	From       string    //test reserved sql keyword as field name
+	Fromx      string    //test reserved sql keyword as field name
 	Age        time.Time `sql:"DEFAULT:current_timestamp"`
 	unexported string    // unexported value
 	CreatedAt  time.Time
@@ -160,13 +158,13 @@ type Animal struct {
 }
 
 type JoinTable struct {
-	From uint64
-	To   uint64
-	Time time.Time `sql:"default: null"`
+	Fromx uint64
+	Tox   uint64
+	Timex time.Time `sql:"default: null"`
 }
 
 type Post struct {
-	Id             int64
+	Id             int64 `gorm:"AUTO_INCREMENT"`
 	CategoryId     sql.NullInt64
 	MainCategoryId int64
 	Title          string
@@ -230,10 +228,9 @@ func getPreparedUser(name string, role string) *User {
 	return &User{
 		Name:            name,
 		Age:             20,
-		Role:            Role{role},
 		BillingAddress:  Address{Address1: fmt.Sprintf("Billing Address %v", name)},
 		ShippingAddress: Address{Address1: fmt.Sprintf("Shipping Address %v", name)},
-		CreditCard:      CreditCard{Number: fmt.Sprintf("123456%v", name)},
+		CreditCard:      CreditCard{CardNumber: fmt.Sprintf("123456%v", name)},
 		Emails: []Email{
 			{Email: fmt.Sprintf("user_%v@example1.com", name)}, {Email: fmt.Sprintf("user_%v@example2.com", name)},
 		},
@@ -251,10 +248,12 @@ func runMigration() {
 	}
 
 	for _, table := range []string{"animals", "user_languages"} {
-		DB.Exec(fmt.Sprintf("drop table %v;", table))
+		fmt.Println(fmt.Sprintf("drop table %v", table))
+		DB.Exec(fmt.Sprintf("drop table %v", table))
 	}
 
-	values := []interface{}{&Short{}, &ReallyLongThingThatReferencesShort{}, &ReallyLongTableNameToTestMySQLNameLengthLimit{}, &NotSoLongTableName{}, &Product{}, &Email{}, &Address{}, &CreditCard{}, &Company{}, &Role{}, &Language{}, &HNPost{}, &EngadgetPost{}, &Animal{}, &User{}, &JoinTable{}, &Post{}, &Category{}, &Comment{}, &Cat{}, &Dog{}, &Hamster{}, &Toy{}, &ElementWithIgnoredField{}}
+	//&ReallyLongThingThatReferencesShort{}, &ReallyLongTableNameToTestMySQLNameLengthLimit{},
+	values := []interface{}{&Short{}, &NotSoLongTableName{}, &Product{}, &Email{}, &Address{}, &CreditCard{}, &Company{}, &Role{}, &Language{}, &HNPost{}, &EngadgetPost{}, &Animal{}, &User{}, &JoinTable{}, &Post{}, &Category{}, &Comment{}, &Cat{}, &Dog{}, &Hamster{}, &Toy{}, &ElementWithIgnoredField{}}
 	for _, value := range values {
 		DB.DropTable(value)
 	}
@@ -309,7 +308,7 @@ func TestIndexes(t *testing.T) {
 		t.Errorf("Should get to create duplicate record when having unique index")
 	}
 
-	var user = User{Name: "sample_user"}
+	var user = User{Id: 1, Name: "sample_user"}
 	DB.Save(&user)
 	if DB.Model(&user).Association("Emails").Append(Email{Email: "not-1duplicated@gmail.com"}, Email{Email: "not-duplicated2@gmail.com"}).Error != nil {
 		t.Errorf("Should get no error when append two emails for user")
@@ -333,16 +332,17 @@ func TestIndexes(t *testing.T) {
 }
 
 type EmailWithIdx struct {
-	Id           int64
+	Id           int64 `gorm:"AUTO_INCREMENT"`
 	UserId       int64
-	Email        string     `sql:"index:idx_email_agent"`
-	UserAgent    string     `sql:"index:idx_email_agent"`
-	RegisteredAt *time.Time `sql:"unique_index"`
+	Email        string    `sql:"index:idx_email_agent"`
+	UserAgent    string    `sql:"index:idx_email_agent"`
+	RegisteredAt time.Time `sql:"unique_index:fdp"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
 
 func TestAutoMigration(t *testing.T) {
+	DB.LogMode(true)
 	DB.AutoMigrate(&Address{})
 	DB.DropTable(&EmailWithIdx{})
 	if err := DB.AutoMigrate(&EmailWithIdx{}).Error; err != nil {
@@ -350,14 +350,14 @@ func TestAutoMigration(t *testing.T) {
 	}
 
 	now := time.Now()
-	DB.Save(&EmailWithIdx{Email: "jinzhu@example.org", UserAgent: "pc", RegisteredAt: &now})
+	DB.Save(&EmailWithIdx{Email: "jinzhu@example.org", UserAgent: "pc", RegisteredAt: now})
 
 	scope := DB.NewScope(&EmailWithIdx{})
 	if !scope.Dialect().HasIndex(scope.TableName(), "idx_email_agent") {
 		t.Errorf("Failed to create index")
 	}
 
-	if !scope.Dialect().HasIndex(scope.TableName(), "uix_email_with_idxes_registered_at") {
+	if !scope.Dialect().HasIndex(scope.TableName(), "fdp") {
 		t.Errorf("Failed to create index")
 	}
 
@@ -369,7 +369,7 @@ func TestAutoMigration(t *testing.T) {
 }
 
 type MultipleIndexes struct {
-	ID     int64
+	ID     int64  `gorm:"AUTO_INCREMENT"`
 	UserID int64  `sql:"unique_index:uix_multipleindexes_user_name,uix_multipleindexes_user_email;index:idx_multipleindexes_user_other"`
 	Name   string `sql:"unique_index:uix_multipleindexes_user_name"`
 	Email  string `sql:"unique_index:,uix_multipleindexes_user_email"`

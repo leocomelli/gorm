@@ -24,7 +24,7 @@ func checkUserHasPreloadData(user User, t *testing.T) {
 		t.Error("Failed to preload user's ShippingAddress")
 	}
 
-	if user.CreditCard.Number != u.CreditCard.Number {
+	if user.CreditCard.CardNumber != u.CreditCard.CardNumber {
 		t.Error("Failed to preload user's CreditCard")
 	}
 
@@ -54,7 +54,7 @@ func TestPreload(t *testing.T) {
 	user1 := getPreloadUser("user1")
 	DB.Save(user1)
 
-	preloadDB := DB.Where("role = ?", "Preload").Preload("BillingAddress").Preload("ShippingAddress").
+	preloadDB := DB.Where("name = ?", "user1").Preload("BillingAddress").Preload("ShippingAddress").
 		Preload("CreditCard").Preload("Emails").Preload("Company")
 	var user User
 	preloadDB.Find(&user)
@@ -100,7 +100,7 @@ func TestAutoPreload(t *testing.T) {
 	user1 := getPreloadUser("auto_user1")
 	DB.Save(user1)
 
-	preloadDB := DB.Set("gorm:auto_preload", true).Where("role = ?", "Preload")
+	preloadDB := DB.Set("gorm:auto_preload", true).Where("name = ?", "auto_user1")
 	var user User
 	preloadDB.Find(&user)
 	checkUserHasPreloadData(user, t)
@@ -126,17 +126,17 @@ func TestAutoPreload(t *testing.T) {
 func TestNestedPreload1(t *testing.T) {
 	type (
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID uint
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1   Level1
 			Level3ID uint
 		}
 		Level3 struct {
-			ID     uint
+			ID     uint `gorm:"AUTO_INCREMENT"`
 			Name   string
 			Level2 Level2
 		}
@@ -170,17 +170,17 @@ func TestNestedPreload1(t *testing.T) {
 func TestNestedPreload2(t *testing.T) {
 	type (
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID uint
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1s  []*Level1
 			Level3ID uint
 		}
 		Level3 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Name    string
 			Level2s []Level2
 		}
@@ -222,20 +222,24 @@ func TestNestedPreload2(t *testing.T) {
 }
 
 func TestNestedPreload3(t *testing.T) {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
 	type (
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID uint
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1   Level1
 			Level3ID uint
 		}
 		Level3 struct {
 			Name    string
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Level2s []Level2
 		}
 	)
@@ -267,19 +271,23 @@ func TestNestedPreload3(t *testing.T) {
 }
 
 func TestNestedPreload4(t *testing.T) {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
 	type (
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID uint
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1s  []Level1
 			Level3ID uint
 		}
 		Level3 struct {
-			ID     uint
+			ID     uint `gorm:"AUTO_INCREMENT"`
 			Name   string
 			Level2 Level2
 		}
@@ -317,17 +325,17 @@ func TestNestedPreload4(t *testing.T) {
 func TestNestedPreload5(t *testing.T) {
 	type (
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID uint
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1   Level1
 			Level3ID uint
 		}
 		Level3 struct {
-			ID     uint
+			ID     uint `gorm:"AUTO_INCREMENT"`
 			Name   string
 			Level2 Level2
 		}
@@ -362,17 +370,17 @@ func TestNestedPreload5(t *testing.T) {
 func TestNestedPreload6(t *testing.T) {
 	type (
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID uint
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1s  []Level1
 			Level3ID uint
 		}
 		Level3 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Name    string
 			Level2s []Level2
 		}
@@ -436,17 +444,17 @@ func TestNestedPreload6(t *testing.T) {
 func TestNestedPreload7(t *testing.T) {
 	type (
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID uint
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1   Level1
 			Level3ID uint
 		}
 		Level3 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Name    string
 			Level2s []Level2
 		}
@@ -492,17 +500,17 @@ func TestNestedPreload7(t *testing.T) {
 func TestNestedPreload8(t *testing.T) {
 	type (
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID uint
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1s  []Level1
 			Level3ID uint
 		}
 		Level3 struct {
-			ID     uint
+			ID     uint `gorm:"AUTO_INCREMENT"`
 			Name   string
 			Level2 Level2
 		}
@@ -551,29 +559,29 @@ func TestNestedPreload8(t *testing.T) {
 func TestNestedPreload9(t *testing.T) {
 	type (
 		Level0 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level1ID uint
 		}
 		Level1 struct {
-			ID         uint
+			ID         uint `gorm:"AUTO_INCREMENT"`
 			Value      string
 			Level2ID   uint
 			Level2_1ID uint
 			Level0s    []Level0
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1s  []Level1
 			Level3ID uint
 		}
 		Level2_1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Level1s  []Level1
 			Level3ID uint
 		}
 		Level3 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Name     string
 			Level2   Level2
 			Level2_1 Level2_1
@@ -647,18 +655,18 @@ func TestNestedPreload9(t *testing.T) {
 }
 
 type LevelA1 struct {
-	ID    uint
+	ID    uint `gorm:"AUTO_INCREMENT"`
 	Value string
 }
 
 type LevelA2 struct {
-	ID       uint
+	ID       uint `gorm:"AUTO_INCREMENT"`
 	Value    string
 	LevelA3s []*LevelA3
 }
 
 type LevelA3 struct {
-	ID        uint
+	ID        uint `gorm:"AUTO_INCREMENT"`
 	Value     string
 	LevelA1ID sql.NullInt64
 	LevelA1   *LevelA1
@@ -712,18 +720,18 @@ func TestNestedPreload10(t *testing.T) {
 }
 
 type LevelB1 struct {
-	ID       uint
+	ID       uint `gorm:"AUTO_INCREMENT"`
 	Value    string
 	LevelB3s []*LevelB3
 }
 
 type LevelB2 struct {
-	ID    uint
+	ID    uint `gorm:"AUTO_INCREMENT"`
 	Value string
 }
 
 type LevelB3 struct {
-	ID        uint
+	ID        uint `gorm:"AUTO_INCREMENT"`
 	Value     string
 	LevelB1ID sql.NullInt64
 	LevelB1   *LevelB1
@@ -764,19 +772,19 @@ func TestNestedPreload11(t *testing.T) {
 }
 
 type LevelC1 struct {
-	ID        uint
+	ID        uint `gorm:"AUTO_INCREMENT"`
 	Value     string
 	LevelC2ID uint
 }
 
 type LevelC2 struct {
-	ID      uint
+	ID      uint `gorm:"AUTO_INCREMENT"`
 	Value   string
 	LevelC1 LevelC1
 }
 
 type LevelC3 struct {
-	ID        uint
+	ID        uint `gorm:"AUTO_INCREMENT"`
 	Value     string
 	LevelC2ID uint
 	LevelC2   LevelC2
@@ -825,7 +833,7 @@ func TestNestedPreload12(t *testing.T) {
 }
 
 func TestManyToManyPreloadWithMultiPrimaryKeys(t *testing.T) {
-	if dialect := os.Getenv("GORM_DIALECT"); dialect == "" || dialect == "sqlite" || dialect == "mssql" {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "" || dialect == "sqlite" || dialect == "mssql" || dialect == "oracle" {
 		return
 	}
 
@@ -918,16 +926,16 @@ func TestManyToManyPreloadWithMultiPrimaryKeys(t *testing.T) {
 func TestManyToManyPreloadForNestedPointer(t *testing.T) {
 	type (
 		Level1 struct {
-			ID    uint
+			ID    uint `gorm:"AUTO_INCREMENT"`
 			Value string
 		}
 		Level2 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level1s []*Level1 `gorm:"many2many:levels;"`
 		}
 		Level3 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID sql.NullInt64
 			Level2   *Level2
@@ -1021,16 +1029,16 @@ func TestManyToManyPreloadForNestedPointer(t *testing.T) {
 func TestNestedManyToManyPreload(t *testing.T) {
 	type (
 		Level1 struct {
-			ID    uint
+			ID    uint `gorm:"AUTO_INCREMENT"`
 			Value string
 		}
 		Level2 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level1s []*Level1 `gorm:"many2many:level1_level2;"`
 		}
 		Level3 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level2s []Level2 `gorm:"many2many:level2_level3;"`
 		}
@@ -1086,16 +1094,16 @@ func TestNestedManyToManyPreload(t *testing.T) {
 func TestNestedManyToManyPreload2(t *testing.T) {
 	type (
 		Level1 struct {
-			ID    uint
+			ID    uint `gorm:"AUTO_INCREMENT"`
 			Value string
 		}
 		Level2 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level1s []*Level1 `gorm:"many2many:level1_level2;"`
 		}
 		Level3 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID sql.NullInt64
 			Level2   *Level2
@@ -1143,16 +1151,16 @@ func TestNestedManyToManyPreload2(t *testing.T) {
 func TestNestedManyToManyPreload3(t *testing.T) {
 	type (
 		Level1 struct {
-			ID    uint
+			ID    uint `gorm:"AUTO_INCREMENT"`
 			Value string
 		}
 		Level2 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level1s []*Level1 `gorm:"many2many:level1_level2;"`
 		}
 		Level3 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID sql.NullInt64
 			Level2   *Level2
@@ -1218,16 +1226,16 @@ func TestNestedManyToManyPreload3(t *testing.T) {
 func TestNestedManyToManyPreload3ForStruct(t *testing.T) {
 	type (
 		Level1 struct {
-			ID    uint
+			ID    uint `gorm:"AUTO_INCREMENT"`
 			Value string
 		}
 		Level2 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level1s []Level1 `gorm:"many2many:level1_level2;"`
 		}
 		Level3 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID sql.NullInt64
 			Level2   Level2
@@ -1293,22 +1301,22 @@ func TestNestedManyToManyPreload3ForStruct(t *testing.T) {
 func TestNestedManyToManyPreload4(t *testing.T) {
 	type (
 		Level4 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level3ID uint
 		}
 		Level3 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level4s []*Level4
 		}
 		Level2 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level3s []*Level3 `gorm:"many2many:level2_level3;"`
 		}
 		Level1 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level2s []*Level2 `gorm:"many2many:level1_level2;"`
 		}
@@ -1351,11 +1359,11 @@ func TestNestedManyToManyPreload4(t *testing.T) {
 func TestManyToManyPreloadForPointer(t *testing.T) {
 	type (
 		Level1 struct {
-			ID    uint
+			ID    uint `gorm:"AUTO_INCREMENT"`
 			Value string
 		}
 		Level2 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Value   string
 			Level1s []*Level1 `gorm:"many2many:levels;"`
 		}
@@ -1435,17 +1443,17 @@ func TestManyToManyPreloadForPointer(t *testing.T) {
 func TestNilPointerSlice(t *testing.T) {
 	type (
 		Level3 struct {
-			ID    uint
+			ID    uint `gorm:"AUTO_INCREMENT"`
 			Value string
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level3ID uint
 			Level3   *Level3
 		}
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Value    string
 			Level2ID uint
 			Level2   *Level2
@@ -1500,21 +1508,26 @@ func TestNilPointerSlice(t *testing.T) {
 }
 
 func TestNilPointerSlice2(t *testing.T) {
+
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
 	type (
 		Level4 struct {
-			ID uint
+			ID uint `gorm:"AUTO_INCREMENT"`
 		}
 		Level3 struct {
-			ID       uint
+			ID       uint          `gorm:"AUTO_INCREMENT"`
 			Level4ID sql.NullInt64 `sql:"index"`
 			Level4   *Level4
 		}
 		Level2 struct {
-			ID      uint
+			ID      uint      `gorm:"AUTO_INCREMENT"`
 			Level3s []*Level3 `gorm:"many2many:level2_level3s"`
 		}
 		Level1 struct {
-			ID       uint
+			ID       uint          `gorm:"AUTO_INCREMENT"`
 			Level2ID sql.NullInt64 `sql:"index"`
 			Level2   *Level2
 		}
@@ -1548,23 +1561,23 @@ func TestNilPointerSlice2(t *testing.T) {
 func TestPrefixedPreloadDuplication(t *testing.T) {
 	type (
 		Level4 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Name     string
 			Level3ID uint
 		}
 		Level3 struct {
-			ID      uint
+			ID      uint `gorm:"AUTO_INCREMENT"`
 			Name    string
 			Level4s []*Level4
 		}
 		Level2 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Name     string
 			Level3ID sql.NullInt64 `sql:"index"`
 			Level3   *Level3
 		}
 		Level1 struct {
-			ID       uint
+			ID       uint `gorm:"AUTO_INCREMENT"`
 			Name     string
 			Level2ID sql.NullInt64 `sql:"index"`
 			Level2   *Level2

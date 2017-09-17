@@ -3,7 +3,7 @@ package gorm_test
 import "testing"
 
 type PointerStruct struct {
-	ID   int64
+	ID   int64 `gorm:"AUTO_INCREMENT"`
 	Name *string
 	Num  *int
 }

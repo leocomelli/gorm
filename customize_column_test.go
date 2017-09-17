@@ -1,6 +1,7 @@
 package gorm_test
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -61,6 +62,10 @@ func TestCustomizeColumn(t *testing.T) {
 }
 
 func TestCustomColumnAndIgnoredFieldClash(t *testing.T) {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because Oracle does not support object names greater than 30")
+	}
+
 	DB.DropTable(&CustomColumnAndIgnoredFieldClash{})
 	if err := DB.AutoMigrate(&CustomColumnAndIgnoredFieldClash{}).Error; err != nil {
 		t.Errorf("Should not raise error: %s", err)
@@ -118,6 +123,10 @@ type CustomizeInvitation struct {
 }
 
 func TestOneToOneWithCustomizedColumn(t *testing.T) {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
 	DB.DropTable(&CustomizeUser{}, &CustomizeInvitation{})
 	DB.AutoMigrate(&CustomizeUser{}, &CustomizeInvitation{})
 
@@ -173,6 +182,10 @@ type PromotionRule struct {
 }
 
 func TestOneToManyWithCustomizedColumn(t *testing.T) {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
 	DB.DropTable(&PromotionDiscount{}, &PromotionCoupon{})
 	DB.AutoMigrate(&PromotionDiscount{}, &PromotionCoupon{})
 
@@ -214,8 +227,10 @@ func TestHasOneWithPartialCustomizedColumn(t *testing.T) {
 	var begin = time.Now()
 	var end = time.Now().Add(24 * time.Hour)
 	discount := PromotionDiscount{
-		Name: "Happy New Year 2",
+		Model: gorm.Model{ID: 1},
+		Name:  "Happy New Year 2",
 		Rule: &PromotionRule{
+			Model: gorm.Model{ID: 1},
 			Name:  "time_limited",
 			Begin: &begin,
 			End:   &end,
@@ -246,11 +261,16 @@ func TestHasOneWithPartialCustomizedColumn(t *testing.T) {
 }
 
 func TestBelongsToWithPartialCustomizedColumn(t *testing.T) {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
 	DB.DropTable(&PromotionDiscount{}, &PromotionBenefit{})
 	DB.AutoMigrate(&PromotionDiscount{}, &PromotionBenefit{})
 
 	discount := PromotionDiscount{
-		Name: "Happy New Year 3",
+		Model: gorm.Model{ID: 1},
+		Name:  "Happy New Year 3",
 		Benefits: []PromotionBenefit{
 			{Name: "free cod"},
 			{Name: "free shipping"},

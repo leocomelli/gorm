@@ -1,6 +1,7 @@
 package gorm_test
 
 import (
+	"os"
 	"testing"
 	"time"
 )
@@ -42,33 +43,41 @@ func TestInlineDelete(t *testing.T) {
 }
 
 func TestSoftDelete(t *testing.T) {
-	type User struct {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
+	type AnotherUser struct {
 		Id        int64
 		Name      string
 		DeletedAt *time.Time
 	}
-	DB.AutoMigrate(&User{})
+	DB.AutoMigrate(&AnotherUser{})
 
-	user := User{Name: "soft_delete"}
+	user := AnotherUser{Name: "soft_delete"}
 	DB.Save(&user)
 	DB.Delete(&user)
 
-	if DB.First(&User{}, "name = ?", user.Name).Error == nil {
+	if DB.First(&AnotherUser{}, "name = ?", user.Name).Error == nil {
 		t.Errorf("Can't find a soft deleted record")
 	}
 
-	if err := DB.Unscoped().First(&User{}, "name = ?", user.Name).Error; err != nil {
+	if err := DB.Unscoped().First(&AnotherUser{}, "name = ?", user.Name).Error; err != nil {
 		t.Errorf("Should be able to find soft deleted record with Unscoped, but err=%s", err)
 	}
 
 	DB.Unscoped().Delete(&user)
-	if !DB.Unscoped().First(&User{}, "name = ?", user.Name).RecordNotFound() {
+	if !DB.Unscoped().First(&AnotherUser{}, "name = ?", user.Name).RecordNotFound() {
 		t.Errorf("Can't find permanently deleted record")
 	}
 }
 
 func TestSoftDeleteWithCustomizedDeletedAtColumnName(t *testing.T) {
-	creditCard := CreditCard{Number: "411111111234567"}
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
+	creditCard := CreditCard{CardNumber: "411111111234567"}
 	DB.Save(&creditCard)
 	DB.Delete(&creditCard)
 
@@ -76,16 +85,16 @@ func TestSoftDeleteWithCustomizedDeletedAtColumnName(t *testing.T) {
 		t.Errorf("CreditCard's DeletedAt's column name should be `deleted_time`")
 	}
 
-	if DB.First(&CreditCard{}, "number = ?", creditCard.Number).Error == nil {
+	if DB.First(&CreditCard{}, "number = ?", creditCard.CardNumber).Error == nil {
 		t.Errorf("Can't find a soft deleted record")
 	}
 
-	if err := DB.Unscoped().First(&CreditCard{}, "number = ?", creditCard.Number).Error; err != nil {
+	if err := DB.Unscoped().First(&CreditCard{}, "number = ?", creditCard.CardNumber).Error; err != nil {
 		t.Errorf("Should be able to find soft deleted record with Unscoped, but err=%s", err)
 	}
 
 	DB.Unscoped().Delete(&creditCard)
-	if !DB.Unscoped().First(&CreditCard{}, "number = ?", creditCard.Number).RecordNotFound() {
+	if !DB.Unscoped().First(&CreditCard{}, "number = ?", creditCard.CardNumber).RecordNotFound() {
 		t.Errorf("Can't find permanently deleted record")
 	}
 }

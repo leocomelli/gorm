@@ -1,6 +1,9 @@
 package gorm_test
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 type BasePost struct {
 	Id    int64
@@ -27,6 +30,10 @@ type EngadgetPost struct {
 }
 
 func TestPrefixColumnNameForEmbeddedStruct(t *testing.T) {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
 	dialect := DB.NewScope(&EngadgetPost{}).Dialect()
 	engadgetPostScope := DB.NewScope(&EngadgetPost{})
 	if !dialect.HasColumn(engadgetPostScope.TableName(), "author_id") || !dialect.HasColumn(engadgetPostScope.TableName(), "author_name") || !dialect.HasColumn(engadgetPostScope.TableName(), "author_email") {
@@ -44,8 +51,8 @@ func TestPrefixColumnNameForEmbeddedStruct(t *testing.T) {
 }
 
 func TestSaveAndQueryEmbeddedStruct(t *testing.T) {
-	DB.Save(&HNPost{BasePost: BasePost{Title: "news"}})
-	DB.Save(&HNPost{BasePost: BasePost{Title: "hn_news"}})
+	DB.Save(&HNPost{BasePost: BasePost{Id: 1, Title: "news"}})
+	DB.Save(&HNPost{BasePost: BasePost{Id: 2, Title: "hn_news"}})
 	var news HNPost
 	if err := DB.First(&news, "title = ?", "hn_news").Error; err != nil {
 		t.Errorf("no error should happen when query with embedded struct, but got %v", err)
@@ -53,7 +60,7 @@ func TestSaveAndQueryEmbeddedStruct(t *testing.T) {
 		t.Errorf("embedded struct's value should be scanned correctly")
 	}
 
-	DB.Save(&EngadgetPost{BasePost: BasePost{Title: "engadget_news"}})
+	DB.Save(&EngadgetPost{BasePost: BasePost{Id: 3, Title: "engadget_news"}})
 	var egNews EngadgetPost
 	if err := DB.First(&egNews, "title = ?", "engadget_news").Error; err != nil {
 		t.Errorf("no error should happen when query with embedded struct, but got %v", err)

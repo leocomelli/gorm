@@ -2,6 +2,7 @@ package gorm_test
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -53,6 +54,10 @@ func (pa *PersonAddress) JoinWith(handler gorm.JoinTableHandlerInterface, db *go
 }
 
 func TestJoinTable(t *testing.T) {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
 	DB.Exec("drop table person_addresses;")
 	DB.AutoMigrate(&Person{})
 	DB.SetJoinTableHandler(&Person{}, "Addresses", &PersonAddress{})
@@ -82,6 +87,10 @@ func TestJoinTable(t *testing.T) {
 }
 
 func TestEmbeddedMany2ManyRelationship(t *testing.T) {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "oracle" {
+		t.Skip("Skipping this because I do not spend time in the first round :)")
+	}
+
 	type EmbeddedPerson struct {
 		ID        int
 		Name      string
