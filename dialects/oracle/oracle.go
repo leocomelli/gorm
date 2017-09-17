@@ -8,7 +8,7 @@ import (
 
 	"strconv"
 
-	"github.com/jinzhu/gorm"
+	"github.com/leocomelli/gorm"
 	_ "github.com/leocomelli/goracle"
 )
 

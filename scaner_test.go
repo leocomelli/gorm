@@ -4,7 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
-	"github.com/jinzhu/gorm"
+	"github.com/leocomelli/gorm"
 	"os"
 	"testing"
 )

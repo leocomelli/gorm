@@ -1,6 +1,6 @@
 Before posting a bug report about a problem, please try to verify that it is a bug and that it has not been reported already, please apply corresponding GitHub labels to the issue, for feature requests, please apply `type:feature`.
 
-DON'T post usage related questions, ask in https://gitter.im/jinzhu/gorm or http://stackoverflow.com/questions/tagged/go-gorm,
+DON'T post usage related questions, ask in https://gitter.im/leocomelli/gorm or http://stackoverflow.com/questions/tagged/go-gorm,
 
 Please answer these questions before submitting your issue. Thanks!
 
@@ -20,11 +20,11 @@ Please provide a complete runnable program to reproduce your issue.
 package main
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mssql"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/leocomelli/gorm"
+	_ "github.com/leocomelli/gorm/dialects/mssql"
+	_ "github.com/leocomelli/gorm/dialects/mysql"
+	_ "github.com/leocomelli/gorm/dialects/postgres"
+	_ "github.com/leocomelli/gorm/dialects/sqlite"
 )
 
 var db *gorm.DB
