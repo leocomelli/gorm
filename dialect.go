@@ -34,6 +34,8 @@ type Dialect interface {
 	// HasColumn check has column or not
 	HasColumn(tableName string, columnName string) bool
 
+	// LimitWhereSQL return generated SQL with rownum clause, as oracle has special case
+	LimitWhereSQL(limit interface{}) string
 	// LimitAndOffsetSQL return generated SQL with Limit and Offset, as mssql has special case
 	LimitAndOffsetSQL(limit, offset interface{}) string
 	// SelectFromDummyTable return select values, for most dbs, `SELECT values` just works, mysql needs `SELECT value FROM DUAL`

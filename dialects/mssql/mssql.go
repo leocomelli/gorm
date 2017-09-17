@@ -143,6 +143,10 @@ func (s mssql) CurrentDatabase() (name string) {
 	return
 }
 
+func (mssql) LimitWhereSQL(limit interface{}) (sql string) {
+	return
+}
+
 func (mssql) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
 	if offset != nil {
 		if parsedOffset, err := strconv.ParseInt(fmt.Sprint(offset), 0, 0); err == nil && parsedOffset >= 0 {

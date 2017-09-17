@@ -122,6 +122,10 @@ func (s commonDialect) CurrentDatabase() (name string) {
 	return
 }
 
+func (commonDialect) LimitWhereSQL(limit interface{}) (sql string) {
+	return
+}
+
 func (commonDialect) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
 	if limit != nil {
 		if parsedLimit, err := strconv.ParseInt(fmt.Sprint(limit), 0, 0); err == nil && parsedLimit >= 0 {

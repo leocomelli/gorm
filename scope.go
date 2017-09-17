@@ -340,10 +340,15 @@ func (scope *Scope) QuotedTableName() (name string) {
 // CombinedConditionSql return combined condition sql
 func (scope *Scope) CombinedConditionSql() string {
 	joinSQL := scope.joinsSQL()
+
 	whereSQL := scope.whereSQL()
+
 	if scope.Search.raw {
 		whereSQL = strings.TrimSuffix(strings.TrimPrefix(whereSQL, "WHERE ("), ")")
 	}
+
+	whereSQL = scope.limitWhereSQL(whereSQL)
+
 	return joinSQL + whereSQL + scope.groupSQL() +
 		scope.havingSQL() + scope.orderSQL() + scope.limitAndOffsetSQL()
 }
@@ -489,7 +494,7 @@ func (scope *Scope) scan(rows *sql.Rows, columns []string, fields []*Field) {
 		}
 
 		for fieldIndex, field := range selectFields {
-			if field.DBName == column {
+			if strings.ToLower(field.DBName) == strings.ToLower(column) {
 				if field.Field.Kind() == reflect.Ptr {
 					values[index] = field.Field.Addr().Interface()
 				} else {
@@ -766,6 +771,14 @@ func (scope *Scope) orderSQL() string {
 		}
 	}
 	return " ORDER BY " + strings.Join(orders, ",")
+}
+
+func (scope *Scope) limitWhereSQL(w string) string {
+	limitSQL := scope.Dialect().LimitWhereSQL(scope.Search.limit)
+	if !strings.Contains(w, "WHERE") {
+		limitSQL = strings.Replace(limitSQL, "AND", "WHERE", 1)
+	}
+	return w + limitSQL
 }
 
 func (scope *Scope) limitAndOffsetSQL() string {
