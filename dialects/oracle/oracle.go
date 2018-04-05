@@ -8,8 +8,8 @@ import (
 
 	"strconv"
 
+	_ "github.com/go-goracle/goracle"
 	"github.com/leocomelli/gorm"
-	_ "github.com/leocomelli/goracle"
 )
 
 type SequenceStore struct {
