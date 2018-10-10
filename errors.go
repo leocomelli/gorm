@@ -26,6 +26,19 @@ func (errs Errors) GetErrors() []error {
 	return errs
 }
 
+// IsRecordNotFoundError returns current error has record not found error or not
+func IsRecordNotFoundError(err error) bool {
+	if errs, ok := err.(Errors); ok {
+		for _, err := range errs {
+			if err == ErrRecordNotFound {
+				return true
+			}
+		}
+	}
+	return err == ErrRecordNotFound
+}
+
+
 // Add adds an error
 func (errs Errors) Add(newErrors ...error) Errors {
 	for _, err := range newErrors {
