@@ -1,15 +1,11 @@
-package oracle
+package gorm
 
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
-
-	"strconv"
-
-	_ "github.com/go-goracle/goracle"
-	"github.com/leocomelli/gorm"
 )
 
 type SequenceStore struct {
@@ -19,7 +15,7 @@ type SequenceStore struct {
 
 var sequenceStoreExists bool
 
-func buildFakeSequenceGenerator(sequenceName string, scope *gorm.Scope) (float64, bool) {
+func buildFakeSequenceGenerator(sequenceName string, scope *Scope) (float64, bool) {
 
 	if sequenceName != "AUTO_INCREMENT" {
 		return 0, false
@@ -48,7 +44,7 @@ func buildFakeSequenceGenerator(sequenceName string, scope *gorm.Scope) (float64
 	return nextVal, true
 }
 
-func setIdentityInsert(scope *gorm.Scope) {
+func setIdentityInsert(scope *Scope) {
 
 	if scope.Dialect().GetName() == "goracle" {
 		for _, field := range scope.PrimaryFields() {
@@ -69,20 +65,20 @@ func setIdentityInsert(scope *gorm.Scope) {
 }
 
 type oracle struct {
-	db gorm.SQLCommon
-	gorm.DefaultForeignKeyNamer
+	db SQLCommon
+	DefaultForeignKeyNamer
 }
 
 func init() {
-	gorm.DefaultCallback.Create().After("gorm:begin_transaction").Register("oracle:set_identity_insert", setIdentityInsert)
-	gorm.RegisterDialect("goracle", &oracle{})
+	DefaultCallback.Create().After("gorm:begin_transaction").Register("oracle:set_identity_insert", setIdentityInsert)
+	RegisterDialect("goracle", &oracle{})
 }
 
 func (oracle) GetName() string {
 	return "goracle"
 }
 
-func (d *oracle) SetDB(db gorm.SQLCommon) {
+func (d *oracle) SetDB(db SQLCommon) {
 	d.db = db
 }
 
@@ -94,8 +90,8 @@ func (oracle) Quote(key string) string {
 	return fmt.Sprintf("%s", strings.ToUpper(key))
 }
 
-func (d *oracle) DataTypeOf(field *gorm.StructField) string {
-	var dataValue, sqlType, size, additionalType = gorm.ParseFieldStructForDialect(field, d)
+func (d *oracle) DataTypeOf(field *StructField) string {
+	var dataValue, sqlType, size, additionalType = ParseFieldStructForDialect(field, d)
 
 	if sqlType == "" {
 		switch dataValue.Kind() {
@@ -118,7 +114,7 @@ func (d *oracle) DataTypeOf(field *gorm.StructField) string {
 				sqlType = "DATE"
 			}
 		default:
-			if gorm.IsByteArrayOrSlice(dataValue) {
+			if IsByteArrayOrSlice(dataValue) {
 				sqlType = "BLOB"
 			}
 		}
