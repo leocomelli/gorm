@@ -744,9 +744,15 @@ func (scope *Scope) whereSQL() (sql string) {
 }
 
 func (scope *Scope) selectSQL() string {
+
+	var cols []string
+	for _, f := range scope.Fields() {
+		cols = append(cols, fmt.Sprintf("%v.%s", scope.QuotedTableName(), f.DBName))
+	}
+
 	if len(scope.Search.selects) == 0 {
 		if len(scope.Search.joinConditions) > 0 {
-			return fmt.Sprintf("%v.*", scope.QuotedTableName())
+			return strings.Join(cols, ",")
 		}
 		return "*"
 	}
